@@ -11,11 +11,13 @@ const Map = () => {
     longitude: -73.99, 
     zoom: 13
   });
+  const [points, setPoints] = useState([]);
+  const [map, setMap] = useState(null);
 
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: 'mapbox://styles/mapbox/light-v10',
+      style: 'mapbox://styles/mapbox/light-v11',
       center: [mapState.longitude, mapState.latitude],
       zoom: mapState.zoom
     });
@@ -28,6 +30,21 @@ const Map = () => {
       });
     });
 
+    map.on('click', (e) => {
+        if (points.length < 2) {
+            const newPoint = [e.lngLat.lng, e.lngLat.lat];
+            console.log({points})
+            points.push(newPoint); // use state isn't synchronous
+            new mapboxgl.Marker()
+                .setLngLat(newPoint)
+                .addTo(map);
+        } else {
+            map.off('click');
+            console.warn('Only two points allowed'); 
+        }
+    });
+
+    setMap(map);
     return () => map.remove();
   }, []);
 

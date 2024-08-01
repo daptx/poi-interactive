@@ -22,6 +22,9 @@ const Map = () => {
   const [radiusMiles, setRadiusMiles] = useState(0.1);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [animationId, setAnimationId] = useState(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const steps = 500; // Number of steps for the animation
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -46,6 +49,8 @@ const Map = () => {
     map.on('click', (e) => {
       const newPoint = [e.lngLat.lng, e.lngLat.lat];
       console.log('New point:', newPoint);
+
+      stopAnimation(); // Stop animation if a new point is added
 
       setPoints(prevPoints => {
         let updatedPoints = [...prevPoints, newPoint];
@@ -81,6 +86,7 @@ const Map = () => {
   const handleMarkerDragEnd = (map) => {
     const updatedPoints = markers.map(marker => marker.getLngLat().toArray());
     console.log('Updated points after drag:', updatedPoints);
+    stopAnimation(); // Stop animation if points are dragged
     setPoints(updatedPoints.slice(0, 2)); // Ensure only two points are kept
     if (updatedPoints.length === 2) {
       drawRoute(updatedPoints[0], updatedPoints[1], map);
@@ -172,8 +178,6 @@ const Map = () => {
     });
 
     // Add a layer for the radius circle.
-    const radiusMeters = radiusMiles * 1609.34; // Convert miles to meters
-
     if (map.getLayer('radius-circle')) {
       map.removeLayer('radius-circle');
       map.removeSource('radius-circle');
@@ -200,15 +204,26 @@ const Map = () => {
     console.log('Route drawn');
   };
 
-  const animatePoint = () => {
+  const stopAnimation = () => {
     if (animationId) {
       cancelAnimationFrame(animationId);
       setAnimationId(null);
     }
+    setIsAnimating(false);
+  };
 
+  const toggleAnimation = () => {
+    if (isAnimating) {
+      stopAnimation();
+    } else {
+      setIsAnimating(true);
+      animatePoint(currentStep);
+    }
+  };
+
+  const animatePoint = (startStep = 0) => {
     const path = turf.lineString(routeCoordinates);
     const distance = turf.length(path);
-    const steps = 500; // Number of steps for the animation
     const arc = [];
 
     // Generate arc points
@@ -217,9 +232,15 @@ const Map = () => {
       arc.push(segment.geometry.coordinates);
     }
 
-    let counter = 0;
+    let counter = startStep;
 
     const animate = () => {
+      if (counter >= arc.length) {
+        stopAnimation();
+        setCurrentStep(0);
+        return;
+      }
+
       const pointData = {
         type: 'FeatureCollection',
         features: [{
@@ -242,13 +263,14 @@ const Map = () => {
       map.getSource('radius-circle').setData(circle);
 
       counter++;
+      setCurrentStep(counter);
 
       if (counter < arc.length) {
         const id = requestAnimationFrame(animate);
         setAnimationId(id);
       } else {
-        cancelAnimationFrame(animationId);
-        setAnimationId(null);
+        stopAnimation(); // Reset animation state when done
+        setCurrentStep(0); // Reset step to allow restart from the beginning
       }
     };
 
@@ -342,19 +364,19 @@ const Map = () => {
           />
         </div>
         <button
-          onClick={animatePoint}
+          onClick={toggleAnimation}
           style={{
             width: '100%',
             padding: '10px',
             fontSize: '14px',
             borderRadius: '4px',
-            backgroundColor: '#007cbf',
+            backgroundColor: isAnimating ? '#ff4d4d' : '#007cbf',
             color: '#fff',
             border: 'none',
             cursor: 'pointer'
           }}
         >
-          Start Animation
+          {isAnimating ? 'Stop Animation' : 'Start Animation'}
         </button>
       </div>
       <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
@@ -363,3 +385,5 @@ const Map = () => {
 };
 
 export default Map;
+
+

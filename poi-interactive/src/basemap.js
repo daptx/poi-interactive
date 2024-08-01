@@ -28,7 +28,7 @@ const Map = () => {
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: 'mapbox://styles/mapbox/light-v11',
+      style: 'mapbox://styles/mapbox/light-v10', // light-v11 won't load maki icons?
       center: [mapState.longitude, mapState.latitude],
       zoom: mapState.zoom,
       bearing: mapState.bearing,
@@ -74,6 +74,23 @@ const Map = () => {
           return [...prevMarkers.slice(1), marker];
         } else {
           return [...prevMarkers, marker];
+        }
+      });
+    });
+
+    // Add Maki icons for points of interest without labels
+    map.on('load', () => {
+      map.addLayer({
+        id: 'poi-icons',
+        type: 'symbol',
+        source: {
+          type: 'vector',
+          url: 'mapbox://mapbox.mapbox-streets-v8'
+        },
+        'source-layer': 'poi_label',
+        layout: {
+          'icon-image': ['concat', ['get', 'maki'], '-15'], // Maki icon name
+          'icon-size': 0.75,
         }
       });
     });
@@ -382,3 +399,4 @@ const Map = () => {
 };
 
 export default Map;
+

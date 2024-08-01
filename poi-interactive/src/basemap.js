@@ -213,10 +213,9 @@ const Map = () => {
   };
 
   const toggleAnimation = () => {
-    if (isAnimating) {
+    if (animationId) {
       stopAnimation();
     } else {
-      setIsAnimating(true);
       animatePoint(currentStep);
     }
   };
@@ -370,13 +369,13 @@ const Map = () => {
             padding: '10px',
             fontSize: '14px',
             borderRadius: '4px',
-            backgroundColor: isAnimating ? '#ff4d4d' : '#007cbf',
+            backgroundColor: animationId ? '#ff4d4d' : '#007cbf',
             color: '#fff',
             border: 'none',
             cursor: 'pointer'
           }}
         >
-          {isAnimating ? 'Stop Animation' : 'Start Animation'}
+          {animationId ? 'Stop Animation' : 'Start Animation'}
         </button>
       </div>
       <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />

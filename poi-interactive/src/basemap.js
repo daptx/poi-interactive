@@ -18,6 +18,9 @@ const Map = () => {
   const [markers, setMarkers] = useState([]);
   const [lineWidth, setLineWidth] = useState(5);
   const [lineColor, setLineColor] = useState('#000000');
+  const [radiusMiles, setRadiusMiles] = useState(1);
+  const [routeCoordinates, setRouteCoordinates] = useState([]);
+  const [animationId, setAnimationId] = useState(null);
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -87,7 +90,7 @@ const Map = () => {
     if (points.length === 2 && map) {
       drawRoute(points[0], points[1], map);
     }
-  }, [lineWidth, lineColor]);
+  }, [lineWidth, lineColor, radiusMiles]);
 
   const drawRoute = async (start, end, map) => {
     if (!map) return;
@@ -106,6 +109,8 @@ const Map = () => {
       console.error('No route found');
       return;
     }
+
+    setRouteCoordinates(route);
 
     if (map.getLayer('route')) {
       map.removeLayer('route');
@@ -136,12 +141,133 @@ const Map = () => {
       }
     });
 
+    // Add a layer for the point that will be animated along the route.
+    if (map.getLayer('point')) {
+      map.removeLayer('point');
+      map.removeSource('point');
+    }
+
+    map.addLayer({
+      id: 'point',
+      type: 'circle',
+      source: {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [{
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: start
+            }
+          }]
+        }
+      },
+      paint: {
+        'circle-radius': 6,
+        'circle-color': '#007cbf'
+      }
+    });
+
+    // Add a layer for the radius circle.
+    const radiusMeters = radiusMiles * 1609.34; // Convert miles to meters
+
+    if (map.getLayer('radius-circle')) {
+      map.removeLayer('radius-circle');
+      map.removeSource('radius-circle');
+    }
+
+    map.addLayer({
+      id: 'radius-circle',
+      type: 'circle',
+      source: {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [{
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: start
+            }
+          }]
+        }
+      },
+      paint: {
+        'circle-radius': {
+          stops: [
+            [0, 0],
+            [20, radiusMeters]
+          ],
+          base: 2
+        },
+        'circle-color': 'rgba(0, 123, 191, 0.2)', // Transparent fill
+        'circle-stroke-color': '#007cbf', // Solid outline
+        'circle-stroke-width': 2
+      }
+    });
+
     console.log('Route drawn');
+  };
+
+  const animatePoint = () => {
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      setAnimationId(null);
+    }
+
+    let counter = 0;
+    const steps = 500; // Number of steps for the animation
+    const pathLength = routeCoordinates.length;
+
+    const animate = () => {
+      const start = routeCoordinates[Math.floor(counter)];
+      const end = routeCoordinates[Math.ceil(counter)];
+
+      if (start && end) {
+        const lng = start[0] + (end[0] - start[0]) * (counter % 1);
+        const lat = start[1] + (end[1] - start[1]) * (counter % 1);
+
+        const pointData = {
+          type: 'FeatureCollection',
+          features: [{
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: [lng, lat]
+            }
+          }]
+        };
+
+        map.getSource('point').setData(pointData);
+        map.getSource('radius-circle').setData(pointData);
+      }
+
+      counter += pathLength / steps;
+
+      if (counter < pathLength) {
+        const id = requestAnimationFrame(animate);
+        setAnimationId(id);
+      } else {
+        cancelAnimationFrame(animationId);
+        setAnimationId(null);
+      }
+    };
+
+    animate();
   };
 
   const handleLineWidthChange = (e) => {
     const value = Math.max(0, Number(e.target.value));
     setLineWidth(value);
+  };
+
+  const handleRadiusChange = (e) => {
+    const value = Math.max(0, Number(e.target.value));
+    setRadiusMiles(value);
   };
 
   const handleBearingChange = (e) => {
@@ -193,6 +319,16 @@ const Map = () => {
           />
         </div>
         <div style={{ marginBottom: '10px' }}>
+          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#666' }}>Radius (miles)</label>
+          <input
+            type="number"
+            value={radiusMiles}
+            onChange={handleRadiusChange}
+            style={{ width: '100%', padding: '5px', fontSize: '14px', borderRadius: '4px', border: '1px solid #ccc' }}
+            min="0"
+          />
+        </div>
+        <div style={{ marginBottom: '10px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#666' }}>Bearing</label>
           <input
             type="number"
@@ -210,6 +346,21 @@ const Map = () => {
             style={{ width: '100%', padding: '5px', fontSize: '14px', borderRadius: '4px', border: '1px solid #ccc' }}
           />
         </div>
+        <button
+          onClick={animatePoint}
+          style={{
+            width: '100%',
+            padding: '10px',
+            fontSize: '14px',
+            borderRadius: '4px',
+            backgroundColor: '#007cbf',
+            color: '#fff',
+            border: 'none',
+            cursor: 'pointer'
+          }}
+        >
+          Start Animation
+        </button>
       </div>
       <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
     </div>
@@ -217,5 +368,3 @@ const Map = () => {
 };
 
 export default Map;
-
-

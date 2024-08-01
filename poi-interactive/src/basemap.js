@@ -22,7 +22,6 @@ const Map = () => {
   const [radiusMiles, setRadiusMiles] = useState(0.1);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [animationId, setAnimationId] = useState(null);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const steps = 500; // Number of steps for the animation
 
@@ -209,7 +208,6 @@ const Map = () => {
       cancelAnimationFrame(animationId);
       setAnimationId(null);
     }
-    setIsAnimating(false);
   };
 
   const toggleAnimation = () => {
@@ -384,5 +382,3 @@ const Map = () => {
 };
 
 export default Map;
-
-

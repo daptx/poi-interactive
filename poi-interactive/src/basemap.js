@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import * as turf from '@turf/turf';
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiZGFwdHgyMSIsImEiOiJjbHl6YWlvMjEwOWVjMmtwc2kzeXA2dTY0In0.hAsyBVcUyaOTUhGLG-kW4w';
 
@@ -218,37 +219,38 @@ const Map = () => {
       setAnimationId(null);
     }
 
-    let counter = 0;
+    const path = turf.lineString(routeCoordinates);
+    const distance = turf.length(path);
     const steps = 500; // Number of steps for the animation
-    const pathLength = routeCoordinates.length;
+    const arc = [];
+
+    // Generate arc points
+    for (let i = 0; i < distance; i += distance / steps) {
+      const segment = turf.along(path, i);
+      arc.push(segment.geometry.coordinates);
+    }
+
+    let counter = 0;
 
     const animate = () => {
-      const start = routeCoordinates[Math.floor(counter)];
-      const end = routeCoordinates[Math.ceil(counter)];
+      const pointData = {
+        type: 'FeatureCollection',
+        features: [{
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: arc[counter]
+          }
+        }]
+      };
 
-      if (start && end) {
-        const lng = start[0] + (end[0] - start[0]) * (counter % 1);
-        const lat = start[1] + (end[1] - start[1]) * (counter % 1);
+      map.getSource('point').setData(pointData);
+      map.getSource('radius-circle').setData(pointData);
 
-        const pointData = {
-          type: 'FeatureCollection',
-          features: [{
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'Point',
-              coordinates: [lng, lat]
-            }
-          }]
-        };
+      counter++;
 
-        map.getSource('point').setData(pointData);
-        map.getSource('radius-circle').setData(pointData);
-      }
-
-      counter += pathLength / steps;
-
-      if (counter < pathLength) {
+      if (counter < arc.length) {
         const id = requestAnimationFrame(animate);
         setAnimationId(id);
       } else {

@@ -17,9 +17,9 @@ const Map = () => {
   const [points, setPoints] = useState([]);
   const [map, setMap] = useState(null);
   const [markers, setMarkers] = useState([]);
-  const [lineWidth, setLineWidth] = useState(5);
+  const [lineWidth, setLineWidth] = useState(2.5);
   const [lineColor, setLineColor] = useState('#000000');
-  const [radiusMiles, setRadiusMiles] = useState(1);
+  const [radiusMiles, setRadiusMiles] = useState(0.1);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [animationId, setAnimationId] = useState(null);
 

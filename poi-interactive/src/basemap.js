@@ -179,34 +179,21 @@ const Map = () => {
       map.removeSource('radius-circle');
     }
 
+    // Use Turf to create a circle polygon representing the radius
+    const circle = turf.circle(start, radiusMiles, {
+      units: 'miles'
+    });
+
     map.addLayer({
       id: 'radius-circle',
-      type: 'circle',
+      type: 'fill',
       source: {
         type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: [{
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'Point',
-              coordinates: start
-            }
-          }]
-        }
+        data: circle
       },
       paint: {
-        'circle-radius': {
-          stops: [
-            [0, 0],
-            [20, radiusMeters]
-          ],
-          base: 2
-        },
-        'circle-color': 'rgba(0, 123, 191, 0.2)', // Transparent fill
-        'circle-stroke-color': '#007cbf', // Solid outline
-        'circle-stroke-width': 2
+        'fill-color': 'rgba(100, 164, 199, 0.2)', // Transparent fill
+        'fill-outline-color': '#0d5176', // Solid outline
       }
     });
 
@@ -246,7 +233,13 @@ const Map = () => {
       };
 
       map.getSource('point').setData(pointData);
-      map.getSource('radius-circle').setData(pointData);
+
+      // Create a new circle around the animated point for the radius
+      const circle = turf.circle(arc[counter], radiusMiles, {
+        units: 'miles'
+      });
+
+      map.getSource('radius-circle').setData(circle);
 
       counter++;
 

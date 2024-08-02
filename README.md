@@ -9,4 +9,4 @@ POIs are sourced from [MapBox Streets V8](https://docs.mapbox.com/data/tilesets/
 ### Running locally
 
     npm install
-    MapboxAccessToken=<YOUR TOKEN> npm start
+    npm start

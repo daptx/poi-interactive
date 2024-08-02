@@ -94,6 +94,25 @@ const Map = () => {
           'icon-size': 1
         }
       });
+
+      // Add a layer for highlighted POIs
+      map.addSource('highlighted-pois', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] } // Empty initial data
+      });
+
+      map.addLayer({
+        id: 'highlighted-pois-layer',
+        type: 'circle',
+        source: 'highlighted-pois',
+        paint: {
+          'circle-radius': 10,
+          'circle-color': '#ffc413', 
+          'circle-opacity': 0.75, 
+          'circle-stroke-width': 0.5, 
+          'circle-stroke-color': '#000000', 
+        }
+      });
     });
 
     setMap(map);
@@ -189,6 +208,10 @@ const Map = () => {
       map.removeLayer('radius-circle');
       map.removeSource('radius-circle');
     }
+    if (map.getLayer('radius-circle-outline')) {
+      map.removeLayer('radius-circle-outline');
+      map.removeSource('radius-circle-outline');
+    }
 
     // Use Turf to create a circle polygon representing the radius
     const circle = turf.circle(start, radiusMiles, {
@@ -204,7 +227,19 @@ const Map = () => {
       },
       paint: {
         'fill-color': 'rgba(100, 164, 199, 0.2)', // Transparent fill
-        'fill-outline-color': '#0d5176', // Solid outline
+      }
+    });
+
+    map.addLayer({
+      id: 'radius-circle-outline',
+      type: 'line',
+      source: {
+        type: 'geojson',
+        data: circle
+      },
+      paint: {
+        'line-color': '#0d5176', // Outline color
+        'line-width': 1, // Width of the outline
       }
     });
 
@@ -266,8 +301,9 @@ const Map = () => {
       });
 
       map.getSource('radius-circle').setData(circle);
+      map.getSource('radius-circle-outline').setData(circle);
 
-      updatePOIList(circle);
+      updatePOIList(circle); // Update POIs during animation
 
       counter++;
       setCurrentStep(counter);
@@ -292,6 +328,20 @@ const Map = () => {
 
     const currentPOIs = new Set(features.map(feature => feature.properties.name));
     setPoiList(Array.from(currentPOIs));
+
+    const highlightedPOIs = {
+      type: 'FeatureCollection',
+      features: features.map(feature => ({
+        type: 'Feature',
+        properties: feature.properties,
+        geometry: feature.geometry
+      }))
+    };
+
+    // Update the map with highlighted POIs
+    if (map.getSource('highlighted-pois')) {
+      map.getSource('highlighted-pois').setData(highlightedPOIs);
+    }
   };
 
   const handleLineWidthChange = (e) => {

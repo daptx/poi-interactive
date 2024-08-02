@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/react-poi-interactive/static/css/main.6345f400.css",
+    "main.js": "/react-poi-interactive/static/js/main.850e3581.js",
+    "static/js/453.3a6583a0.chunk.js": "/react-poi-interactive/static/js/453.3a6583a0.chunk.js",
+    "index.html": "/react-poi-interactive/index.html",
+    "main.6345f400.css.map": "/react-poi-interactive/static/css/main.6345f400.css.map",
+    "main.850e3581.js.map": "/react-poi-interactive/static/js/main.850e3581.js.map",
+    "453.3a6583a0.chunk.js.map": "/react-poi-interactive/static/js/453.3a6583a0.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6345f400.css",
+    "static/js/main.850e3581.js"
+  ]
+}

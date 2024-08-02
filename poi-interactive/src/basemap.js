@@ -63,10 +63,10 @@ const Map = () => {
         return updatedPoints;
       });
 
-      const marker = new mapboxgl.Marker({ draggable: true })
+      // Add a marker for each point
+      const marker = new mapboxgl.Marker()
         .setLngLat(newPoint)
-        .addTo(map)
-        .on('dragend', () => handleMarkerDragEnd(map));
+        .addTo(map);
 
       setMarkers(prevMarkers => {
         if (prevMarkers.length >= 2) {
@@ -99,16 +99,6 @@ const Map = () => {
     setMap(map);
     return () => map.remove();
   }, []);
-
-  const handleMarkerDragEnd = (map) => {
-    const updatedPoints = markers.map(marker => marker.getLngLat().toArray());
-    console.log('Updated points after drag:', updatedPoints);
-    stopAnimation(); // Stop animation if points are dragged
-    setPoints(updatedPoints.slice(0, 2)); // Ensure only two points are kept
-    if (updatedPoints.length === 2) {
-      drawRoute(updatedPoints[0], updatedPoints[1], map);
-    }
-  };
 
   useEffect(() => {
     if (points.length === 2 && map) {

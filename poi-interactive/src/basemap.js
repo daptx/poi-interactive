@@ -330,9 +330,6 @@ const animatePoint = (startStep = 0) => {
   animate();
 };
 
-// Rest of your Map component code...
-
-
 
   const updatePOIList = (circle) => {
     const features = map.querySourceFeatures('poi-icons', {

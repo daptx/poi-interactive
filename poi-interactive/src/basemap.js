@@ -22,12 +22,17 @@ const Map = () => {
   const [markers, setMarkers] = useState([]);
   const [lineWidth, setLineWidth] = useState(2.5);
   const [lineColor, setLineColor] = useState('#000000');
+  const radiusMilesRef = useRef(0.1);
   const [radiusMiles, setRadiusMiles] = useState(0.1);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [animationId, setAnimationId] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [poiList, setPoiList] = useState([]);
   const steps = 500; // Number of steps for the animation
+
+  useEffect(() => {
+    radiusMilesRef.current = radiusMiles;
+  }, [radiusMiles]);
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -265,64 +270,68 @@ const Map = () => {
     }
   };
 
-  const animatePoint = (startStep = 0) => {
-    const path = turf.lineString(routeCoordinates);
-    const distance = turf.length(path);
-    const arc = [];
+const animatePoint = (startStep = 0) => {
+  const path = turf.lineString(routeCoordinates);
+  const distance = turf.length(path);
+  const arc = [];
 
-    // Generate arc points
-    for (let i = 0; i < distance; i += distance / steps) {
-      const segment = turf.along(path, i);
-      arc.push(segment.geometry.coordinates);
+  // Generate arc points
+  for (let i = 0; i < distance; i += distance / steps) {
+    const segment = turf.along(path, i);
+    arc.push(segment.geometry.coordinates);
+  }
+
+  let counter = startStep;
+
+  const animate = () => {
+    if (counter >= arc.length) {
+      stopAnimation();
+      setCurrentStep(0); // Reset step when animation completes
+      return;
     }
 
-    let counter = startStep;
-
-    const animate = () => {
-      if (counter >= arc.length) {
-        stopAnimation();
-        setCurrentStep(0); // Reset step when animation completes
-        return;
-      }
-
-      const pointData = {
-        type: 'FeatureCollection',
-        features: [{
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'Point',
-            coordinates: arc[counter]
-          }
-        }]
-      };
-
-      map.getSource('point').setData(pointData);
-
-      // Create a new circle around the animated point for the radius
-      const circle = turf.circle(arc[counter], radiusMiles, {
-        units: 'miles'
-      });
-
-      map.getSource('radius-circle').setData(circle);
-      map.getSource('radius-circle-outline').setData(circle);
-
-      updatePOIList(circle); // Update POIs during animation
-
-      counter++;
-      setCurrentStep(counter);
-
-      if (counter < arc.length) {
-        const id = requestAnimationFrame(animate);
-        setAnimationId(id);
-      } else {
-        setCurrentStep(0); // Reset step to allow restart from the beginning
-        setAnimationId(null); // Ensure animation is marked as stopped
-      }
+    const pointData = {
+      type: 'FeatureCollection',
+      features: [{
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'Point',
+          coordinates: arc[counter]
+        }
+      }]
     };
 
-    animate();
+    map.getSource('point').setData(pointData);
+
+    // Use the ref value for radiusMiles to ensure latest value is used
+    const circle = turf.circle(arc[counter], radiusMilesRef.current, {
+      units: 'miles'
+    });
+
+    map.getSource('radius-circle').setData(circle);
+    map.getSource('radius-circle-outline').setData(circle);
+
+    updatePOIList(circle); // Update POIs during animation
+
+    counter++;
+    setCurrentStep(counter);
+
+    if (counter < arc.length) {
+      const id = requestAnimationFrame(animate);
+      setAnimationId(id);
+    } else {
+      setCurrentStep(0); // Reset step to allow restart from the beginning
+      setAnimationId(null); // Ensure animation is marked as stopped
+    }
   };
+
+  animate();
+};
+
+// Rest of your Map component code...
+
+
 
   const updatePOIList = (circle) => {
     const features = map.querySourceFeatures('poi-icons', {

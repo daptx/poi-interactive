@@ -58,7 +58,7 @@ const Map = () => {
       const newPoint = [e.lngLat.lng, e.lngLat.lat];
       console.log('New point:', newPoint);
 
-      stopAnimation(); // Stop animation if a new point is added
+     // stopAnimation();
 
       setPoints(prevPoints => {
         let updatedPoints = [...prevPoints, newPoint];
@@ -264,6 +264,7 @@ const Map = () => {
 
   const toggleAnimation = () => {
     if (animationId) {
+      //console.log('Stopping animation');
       stopAnimation();
     } else {
       animatePoint(currentStep);

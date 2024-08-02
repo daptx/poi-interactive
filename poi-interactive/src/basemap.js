@@ -23,6 +23,7 @@ const Map = () => {
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [animationId, setAnimationId] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
+  const [poiList, setPoiList] = useState([]);
   const steps = 500; // Number of steps for the animation
 
   useEffect(() => {
@@ -90,7 +91,7 @@ const Map = () => {
         'source-layer': 'poi_label',
         layout: {
           'icon-image': ['concat', ['get', 'maki'], '-15'], // Maki icon name
-          'icon-size': 0.75,
+          'icon-size': 1
         }
       });
     });
@@ -251,7 +252,7 @@ const Map = () => {
     const animate = () => {
       if (counter >= arc.length) {
         stopAnimation();
-        setCurrentStep(0);
+        setCurrentStep(0); // Reset step when animation completes
         return;
       }
 
@@ -276,6 +277,8 @@ const Map = () => {
 
       map.getSource('radius-circle').setData(circle);
 
+      updatePOIList(circle);
+
       counter++;
       setCurrentStep(counter);
 
@@ -283,12 +286,22 @@ const Map = () => {
         const id = requestAnimationFrame(animate);
         setAnimationId(id);
       } else {
-        stopAnimation(); // Reset animation state when done
         setCurrentStep(0); // Reset step to allow restart from the beginning
+        setAnimationId(null); // Ensure animation is marked as stopped
       }
     };
 
     animate();
+  };
+
+  const updatePOIList = (circle) => {
+    const features = map.querySourceFeatures('poi-icons', {
+      sourceLayer: 'poi_label',
+      filter: ['within', circle]
+    });
+
+    const currentPOIs = new Set(features.map(feature => feature.properties.name));
+    setPoiList(Array.from(currentPOIs));
   };
 
   const handleLineWidthChange = (e) => {
@@ -315,6 +328,27 @@ const Map = () => {
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
+      <div
+        style={{
+          position: 'absolute',
+          top: '10px',
+          left: '10px',
+          width: '220px',
+          padding: '15px',
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderRadius: '8px',
+          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+          fontFamily: 'Arial, sans-serif',
+          zIndex: 1
+        }}
+      >
+        <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#333' }}>POIs Within Radius</h3>
+        <ul style={{ listStyleType: 'none', padding: 0 }}>
+          {poiList.map((poi, index) => (
+            <li key={index} style={{ fontSize: '14px', color: '#666' }}>{poi}</li>
+          ))}
+        </ul>
+      </div>
       <div
         style={{
           position: 'absolute',
@@ -399,4 +433,3 @@ const Map = () => {
 };
 
 export default Map;
-

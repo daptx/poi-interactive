@@ -264,7 +264,7 @@ const Map = () => {
 
   const toggleAnimation = () => {
     if (animationId) {
-      //console.log('Stopping animation');
+      console.log('Stopping animation');
       stopAnimation();
     } else {
       animatePoint(currentStep);

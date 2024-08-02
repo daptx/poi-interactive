@@ -106,9 +106,9 @@ const Map = () => {
         type: 'circle',
         source: 'highlighted-pois',
         paint: {
-          'circle-radius': 10,
+          'circle-radius': 12,
           'circle-color': '#ffc413', 
-          'circle-opacity': 0.75, 
+          'circle-opacity': 0.1, 
           'circle-stroke-width': 0.5, 
           'circle-stroke-color': '#000000', 
         }
@@ -382,7 +382,7 @@ const Map = () => {
           zIndex: 1
         }}
       >
-        <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#333' }}>POIs Within Radius</h3>
+        <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#333' }}>POIs Highlighted</h3>
         <ul style={{ listStyleType: 'none', padding: 0 }}>
           {poiList.map((poi, index) => (
             <li key={index} style={{ fontSize: '14px', color: '#666' }}>{poi}</li>
@@ -403,9 +403,9 @@ const Map = () => {
           zIndex: 1
         }}
       >
-        <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#333' }}>Route Settings</h3>
+        <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#333' }}>Route Design Settings</h3>
         <div style={{ marginBottom: '10px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#666' }}>Line Width</label>
+          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#666' }}>Route Width</label>
           <input
             type="number"
             value={lineWidth}
@@ -415,7 +415,7 @@ const Map = () => {
           />
         </div>
         <div style={{ marginBottom: '10px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#666' }}>Line Color</label>
+          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#666' }}>Route Color</label>
           <input
             type="color"
             value={lineColor}
@@ -434,7 +434,7 @@ const Map = () => {
           />
         </div>
         <div style={{ marginBottom: '10px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#666' }}>Bearing</label>
+          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#666' }}>Bearing (-180 to 180)</label>
           <input
             type="number"
             value={mapState.bearing}
@@ -443,7 +443,7 @@ const Map = () => {
           />
         </div>
         <div style={{ marginBottom: '10px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#666' }}>Pitch</label>
+          <label style={{ display: 'block', marginBottom: '5px', fontSize: '14px', color: '#666' }}>Pitch (0 to 85)</label>
           <input
             type="number"
             value={mapState.pitch}
@@ -464,7 +464,7 @@ const Map = () => {
             cursor: 'pointer'
           }}
         >
-          {animationId ? 'Stop Animation' : 'Start Animation'}
+          {animationId ? 'Pause Route' : 'Start Route'}
         </button>
       </div>
       <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />

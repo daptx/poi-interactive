@@ -22,8 +22,8 @@ const Map = () => {
   const [markers, setMarkers] = useState([]);
   const [lineWidth, setLineWidth] = useState(2.5);
   const [lineColor, setLineColor] = useState('#000000');
-  const radiusMilesRef = useRef(0.1);
-  const [radiusMiles, setRadiusMiles] = useState(0.1);
+  const radiusMilesRef = useRef(0.05);
+  const [radiusMiles, setRadiusMiles] = useState(0.05);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [animationId, setAnimationId] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);

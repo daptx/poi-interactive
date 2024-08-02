@@ -5,8 +5,3 @@ Pedestrians can greatly benefit from seeing what POIs are around them when they 
 POIs are sourced from [MapBox Streets V8](https://docs.mapbox.com/data/tilesets/reference/mapbox-streets-v8/).
 
 ![demo](test.gif)
-
-### Running locally
-
-    npm install
-    npm start

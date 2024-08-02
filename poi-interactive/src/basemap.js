@@ -1,10 +1,11 @@
-import React, { useRef, useEffect, useState } from 'react';
+// Import the necessary libraries
+import React, { useRef, useEffect, useState } from 'react'; // hooks
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import * as turf from '@turf/turf';
 import MapControls from './MapControls';
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiZGFwdHgyMSIsImEiOiJjbHl6YWlvMjEwOWVjMmtwc2kzeXA2dTY0In0.hAsyBVcUyaOTUhGLG-kW4w';
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 const Map = () => {
   const mapContainerRef = useRef(null);
@@ -15,6 +16,7 @@ const Map = () => {
     bearing: 0,
     pitch: 0
   });
+  // define the state variables
   const [points, setPoints] = useState([]);
   const [map, setMap] = useState(null);
   const [markers, setMarkers] = useState([]);
@@ -80,7 +82,8 @@ const Map = () => {
       });
     });
 
-    // Add Maki icons for points of interest without labels
+    // Adding points of interest (POI) maki icons
+    // https://labs.mapbox.com/maki-icons/
     map.on('load', () => {
       map.addLayer({
         id: 'poi-icons',

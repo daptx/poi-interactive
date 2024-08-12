@@ -1,27 +1,21 @@
-import React from 'react';
-import ReactDOM from "react-dom";
+import React from "react";
 import { BaseProvider, LightTheme } from "baseui";
 import { Client as Styletron } from "styletron-engine-atomic";
 import { Provider as StyletronProvider } from "styletron-react";
-import './App.css';
-import Map from './basemap';
+import './styles/index.css';
+import MapController from './controllers/MapController'; 
 
 const engine = new Styletron();
 
-ReactDOM.render(
-  <StyletronProvider value={engine}>
-    <BaseProvider theme={LightTheme}>
-      <App />
-    </BaseProvider>
-  </StyletronProvider>,
-  document.getElementById("root")
-);
-
 function App() {
   return (
-    <div className="App">
-      <Map />
-    </div>
+    <StyletronProvider value={engine}>
+      <BaseProvider theme={LightTheme}>
+        <div className="App">
+          <MapController />
+        </div>
+      </BaseProvider>
+    </StyletronProvider>
   );
 }
 

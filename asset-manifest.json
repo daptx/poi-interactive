@@ -1,15 +1,13 @@
 {
   "files": {
     "main.css": "/poi-interactive/static/css/main.6345f400.css",
-    "main.js": "/poi-interactive/static/js/main.d3bd3b2a.js",
-    "static/js/453.3a6583a0.chunk.js": "/poi-interactive/static/js/453.3a6583a0.chunk.js",
+    "main.js": "/poi-interactive/static/js/main.aacb26a0.js",
     "index.html": "/poi-interactive/index.html",
     "main.6345f400.css.map": "/poi-interactive/static/css/main.6345f400.css.map",
-    "main.d3bd3b2a.js.map": "/poi-interactive/static/js/main.d3bd3b2a.js.map",
-    "453.3a6583a0.chunk.js.map": "/poi-interactive/static/js/453.3a6583a0.chunk.js.map"
+    "main.aacb26a0.js.map": "/poi-interactive/static/js/main.aacb26a0.js.map"
   },
   "entrypoints": [
     "static/css/main.6345f400.css",
-    "static/js/main.d3bd3b2a.js"
+    "static/js/main.aacb26a0.js"
   ]
 }

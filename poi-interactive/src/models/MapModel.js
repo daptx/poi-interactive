@@ -1,10 +1,24 @@
 import * as turf from "@turf/turf";
 
 export const fetchRoute = async (start, end) => {
-  const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}`;
+  const params = new URLSearchParams({
+    geometries: "geojson",
+    access_token: process.env.REACT_APP_MAPBOX_ACCESS_TOKEN,
+  });
+  const coords = `${start[0]},${start[1]};${end[0]},${end[1]}`;
+  const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${coords}?${params.toString()}`;
+
   const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Mapbox Directions request failed (${response.status})`);
+  }
+
   const data = await response.json();
-  return data.routes[0]?.geometry.coordinates;
+  const route = data.routes?.[0]?.geometry?.coordinates;
+  if (!route) {
+    throw new Error("No walking route found between these points");
+  }
+  return route;
 };
 
 export const createCircle = (center, radius) => {

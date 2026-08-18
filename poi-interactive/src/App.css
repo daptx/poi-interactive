@@ -1,3 +1,75 @@
+.app-shell {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
 
+.map-container {
+  width: 100%;
+  height: 100%;
+}
 
+.controls-wrapper {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  pointer-events: none;
+}
 
+.control-panel {
+  /* actual width is set on the baseui Card itself (see cardOverrides in
+     MapControls.js) since Card's own Styletron rules would otherwise win
+     the cascade over a plain class here */
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  pointer-events: auto;
+}
+
+.poi-list {
+  max-height: 220px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.poi-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background-color: #0d5176;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.color-swatch {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
+.App.dark .color-swatch {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 760px) {
+  .controls-wrapper {
+    flex-direction: column;
+  }
+}

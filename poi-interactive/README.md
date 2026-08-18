@@ -1,3 +1,9 @@
+## Setup
+
+1. Copy `.env.example` to `.env` and set `REACT_APP_MAPBOX_ACCESS_TOKEN` to your own Mapbox token.
+2. In the Mapbox dashboard, scope that token to **URL restrictions** for the domains you deploy to (and keep it a public, non-secret-scoped token) — this is a client-side app, so the token ships in the bundle regardless.
+3. `.env` is gitignored — never commit it. If a token is ever committed, rotate/delete it in the Mapbox dashboard immediately; removing the file afterwards does not undo the exposure.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
